@@ -361,6 +361,28 @@ async function downloadSongPackage(id, quality) {
   return downloadId;
 }
 
+async function downloadAudioOnly(id, quality) {
+  const songResponse = await getSong(id, quality, "json");
+  const song = songResponse.data;
+  if (!song.url) {
+    throw new Error("没有获取到歌曲下载地址");
+  }
+
+  const audio = await fetchBinary(song.url);
+  const baseName = sanitizeFilename(`${song.ar_name || "未知歌手"} - ${song.name || id}`);
+  const objectUrl = URL.createObjectURL(new Blob([audio.bytes], {
+    type: audio.contentType || "audio/mpeg"
+  }));
+  const downloadId = await chrome.downloads.download({
+    url: objectUrl,
+    filename: `${baseName}.${guessAudioExtension(audio.contentType, song.url)}`,
+    saveAs: false,
+    conflictAction: "uniquify"
+  });
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  return downloadId;
+}
+
 async function fetchBinary(url) {
   const response = await fetch(url, {
     credentials: "include",

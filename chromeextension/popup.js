@@ -197,6 +197,7 @@ function renderSong(container, song) {
         <h2 class="title">${escapeHtml(song.name || "未知歌曲")}</h2>
         <div class="meta">${escapeHtml(song.ar_name || "")}<br>${escapeHtml(song.al_name || "")}</div>
         <div class="actions">
+          <button data-action="audio" data-id="${escapeAttr(song.id)}">下载歌曲</button>
           <button data-action="download" data-id="${escapeAttr(song.id)}">打包下载</button>
           <button data-action="copy" data-url="${escapeAttr(song.url || "")}">复制链接</button>
           <button data-action="lyrics">歌词</button>
@@ -227,6 +228,7 @@ function renderTrackList(container, tracks, title) {
           </div>
           <div class="actions">
             <button data-action="fill" data-id="${escapeAttr(track.id)}">解析</button>
+            <button data-action="audio" data-id="${escapeAttr(track.id)}">歌曲</button>
             <button data-action="download" data-id="${escapeAttr(track.id)}">打包</button>
           </div>
         </div>
@@ -247,6 +249,19 @@ function bindActionButtons(container, song) {
         button.textContent = "打包中";
         try {
           await downloadSongPackage(id, $("#quality").value);
+        } catch (error) {
+          alert(error.message || String(error));
+        } finally {
+          button.disabled = false;
+          button.textContent = oldText;
+        }
+      }
+      if (action === "audio") {
+        button.disabled = true;
+        const oldText = button.textContent;
+        button.textContent = "下载中";
+        try {
+          await downloadAudioOnly(id, $("#quality").value);
         } catch (error) {
           alert(error.message || String(error));
         } finally {
