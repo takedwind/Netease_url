@@ -1,6 +1,10 @@
 importScripts("api.js");
 
 chrome.runtime.onInstalled.addListener(() => {
+  if (chrome.sidePanel?.setPanelBehavior) {
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => undefined);
+  }
+
   chrome.contextMenus.create({
     id: "parse-link",
     title: "解析网易云链接",
@@ -11,9 +15,19 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "打包下载网易云歌曲",
     contexts: ["link", "selection", "page"]
   });
+  chrome.contextMenus.create({
+    id: "open-history",
+    title: "打开下载历史侧边栏",
+    contexts: ["action", "page", "link", "selection"]
+  });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === "open-history") {
+    await openHistorySidePanel(tab);
+    return;
+  }
+
   const source = info.linkUrl || info.selectionText || tab?.url || "";
   const target = extractNeteaseTarget(source);
   if (!target?.isNetease) {
@@ -38,6 +52,13 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }
   }
 });
+
+async function openHistorySidePanel(tab) {
+  const windowId = tab?.windowId;
+  if (chrome.sidePanel?.open && windowId !== undefined) {
+    await chrome.sidePanel.open({ windowId });
+  }
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "download-song") {

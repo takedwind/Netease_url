@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>下载历史</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+      body {
+        width: auto;
+        min-height: 100vh;
+      }
+      .app {
+        padding: 16px;
+      }
+      .history-toolbar {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 8px;
+        margin: 14px 0;
+      }
+      .history-item {
+        display: grid;
+        grid-template-columns: 54px 1fr;
+        gap: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 10px;
+      }
+      .history-cover {
+        width: 54px;
+        height: 54px;
+        border-radius: 6px;
+        object-fit: cover;
+        background: var(--soft);
+      }
+      .history-list {
+        display: grid;
+        gap: 10px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 20px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: var(--soft);
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>下载历史</h1>
+          <p id="historyCount">正在读取历史...</p>
+        </div>
+      </header>
+
+      <section class="history-toolbar">
+        <input id="historySearch" type="search" placeholder="搜索歌曲 / 歌手 / 专辑">
+        <button id="refreshHistory">刷新</button>
+        <button id="clearHistory">清空</button>
+      </section>
+
+      <section id="historyList" class="history-list"></section>
+    </main>
+
+    <script src="api.js"></script>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

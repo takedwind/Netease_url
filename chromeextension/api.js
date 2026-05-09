@@ -16,6 +16,8 @@ const QUALITY_LABELS = {
 };
 
 const NETEASE_ORIGIN = "https://music.163.com";
+const HISTORY_KEY = "downloadHistory";
+const MAX_HISTORY_ITEMS = 100;
 
 function encodeQuery(params) {
   const search = new URLSearchParams();
@@ -357,6 +359,17 @@ async function downloadSongPackage(id, quality) {
     saveAs: false,
     conflictAction: "uniquify"
   });
+  await addDownloadHistory({
+    id: song.id,
+    name: song.name,
+    artists: song.ar_name,
+    album: song.al_name,
+    cover: song.pic,
+    quality,
+    mode: "package",
+    filename: `${baseName}.zip`,
+    downloadedAt: Date.now()
+  });
   setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
   return downloadId;
 }
@@ -379,8 +392,48 @@ async function downloadAudioOnly(id, quality) {
     saveAs: false,
     conflictAction: "uniquify"
   });
+  await addDownloadHistory({
+    id: song.id,
+    name: song.name,
+    artists: song.ar_name,
+    album: song.al_name,
+    cover: song.pic,
+    quality,
+    mode: "audio",
+    filename: `${baseName}.${guessAudioExtension(audio.contentType, song.url)}`,
+    downloadedAt: Date.now()
+  });
   setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
   return downloadId;
+}
+
+async function getDownloadHistory() {
+  const stored = await chrome.storage.local.get({ [HISTORY_KEY]: [] });
+  return stored[HISTORY_KEY] || [];
+}
+
+async function addDownloadHistory(item) {
+  const history = await getDownloadHistory();
+  const nextItem = {
+    ...item,
+    key: `${item.id}-${item.mode}-${Date.now()}`
+  };
+  const next = [
+    nextItem,
+    ...history.filter((entry) => !(entry.id === item.id && entry.mode === item.mode))
+  ].slice(0, MAX_HISTORY_ITEMS);
+  await chrome.storage.local.set({ [HISTORY_KEY]: next });
+}
+
+async function removeDownloadHistory(key) {
+  const history = await getDownloadHistory();
+  await chrome.storage.local.set({
+    [HISTORY_KEY]: history.filter((entry) => entry.key !== key)
+  });
+}
+
+async function clearDownloadHistory() {
+  await chrome.storage.local.set({ [HISTORY_KEY]: [] });
 }
 
 async function fetchBinary(url) {
