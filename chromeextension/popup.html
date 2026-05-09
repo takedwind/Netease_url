@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>网易云音乐智能助手</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>网易云音乐智能助手</h1>
+          <p id="statusText">正在检测服务...</p>
+        </div>
+        <button id="openOptions" class="icon-btn" title="设置">⚙</button>
+      </header>
+
+      <nav class="tabs" aria-label="功能">
+        <button class="tab active" data-tab="smart">当前</button>
+        <button class="tab" data-tab="search">搜索</button>
+        <button class="tab" data-tab="playlist">歌单</button>
+        <button class="tab" data-tab="album">专辑</button>
+        <button class="tab" data-tab="service">服务</button>
+      </nav>
+
+      <section id="smart" class="panel active">
+        <label class="field">
+          <span>歌曲 ID 或链接</span>
+          <input id="smartInput" type="text" placeholder="自动读取当前页面，也可手动输入">
+        </label>
+        <div class="row">
+          <label class="field grow">
+            <span>音质</span>
+            <select id="quality"></select>
+          </label>
+          <button id="parseSong" class="primary">解析</button>
+        </div>
+        <div id="songResult" class="result empty">打开网易云歌曲页或输入歌曲链接后解析。</div>
+      </section>
+
+      <section id="search" class="panel">
+        <label class="field">
+          <span>关键词</span>
+          <input id="searchKeyword" type="search" placeholder="歌曲名 / 歌手 / 专辑">
+        </label>
+        <div class="row">
+          <label class="field grow">
+            <span>数量</span>
+            <input id="searchLimit" type="number" min="1" max="100" value="20">
+          </label>
+          <button id="runSearch" class="primary">搜索</button>
+        </div>
+        <div id="searchResult" class="result empty">搜索结果会显示在这里。</div>
+      </section>
+
+      <section id="playlist" class="panel">
+        <label class="field">
+          <span>歌单 ID 或链接</span>
+          <input id="playlistInput" type="text" placeholder="打开歌单页会自动填入">
+        </label>
+        <button id="parsePlaylist" class="primary full">解析歌单</button>
+        <div id="playlistResult" class="result empty">歌单曲目会显示在这里。</div>
+      </section>
+
+      <section id="album" class="panel">
+        <label class="field">
+          <span>专辑 ID 或链接</span>
+          <input id="albumInput" type="text" placeholder="打开专辑页会自动填入">
+        </label>
+        <button id="parseAlbum" class="primary full">解析专辑</button>
+        <div id="albumResult" class="result empty">专辑曲目会显示在这里。</div>
+      </section>
+
+      <section id="service" class="panel">
+        <label class="field">
+          <span>默认音质偏好</span>
+          <select id="defaultQuality"></select>
+        </label>
+        <label class="switch-row">
+          <input id="autoParse" type="checkbox">
+          <span>打开弹窗时自动识别当前网易云页面</span>
+        </label>
+        <div class="button-grid">
+          <button id="saveSettings">保存设置</button>
+          <button id="checkHealth">健康检查</button>
+          <button id="loadApiInfo">接口信息</button>
+        </div>
+        <div id="serviceResult" class="result empty">这里会显示 `/health` 和 `/api/info` 返回的信息。</div>
+      </section>
+    </main>
+
+    <script src="api.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

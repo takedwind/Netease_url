@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "网易云音乐智能助手",
+  "description": "自动识别网易云音乐页面，内置接口完成解析、搜索、歌单/专辑读取和下载。",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "网易云音乐智能助手",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://music.163.com/*",
+        "http://music.163.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "downloads",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://music.163.com/*",
+    "http://music.163.com/*"
+  ],
+  "options_page": "options.html"
+}

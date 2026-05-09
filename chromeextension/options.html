@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>网易云音乐智能助手设置</title>
+    <link rel="stylesheet" href="popup.css">
+    <style>
+      body {
+        width: auto;
+        min-height: 100vh;
+      }
+      .app {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 28px 18px;
+      }
+      .settings-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        padding: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>网易云音乐智能助手设置</h1>
+          <p>插件独立运行，不依赖后端服务。</p>
+        </div>
+      </header>
+
+      <section class="settings-card">
+        <label class="field">
+          <span>默认音质偏好</span>
+          <select id="defaultQuality"></select>
+        </label>
+        <label class="switch-row">
+          <input id="autoParse" type="checkbox">
+          <span>打开弹窗时自动识别并解析当前网易云页面</span>
+        </label>
+        <button id="saveSettings" class="primary">保存设置</button>
+        <div id="result" class="result empty" style="margin-top:12px;">设置会同步到当前 Chrome 配置文件。</div>
+      </section>
+    </main>
+
+    <script src="api.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

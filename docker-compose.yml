@@ -3,8 +3,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: netease-url
     env_file:
       - .env
     ports:
       - "5000:5000"
+    volumes:
+      - ./cookie.txt:/app/cookie.txt
+      - ./downloads:/app/downloads
     restart: unless-stopped
