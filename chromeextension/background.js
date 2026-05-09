@@ -61,8 +61,15 @@ async function openHistorySidePanel(tab) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === "download-song") {
-    startBrowserDownload(message.id, message.quality)
+  if (message?.type === "download-song" || message?.type === "download-package") {
+    downloadSongPackage(message.id, message.quality || "standard")
+      .then((downloadId) => sendResponse({ ok: true, downloadId }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
+
+  if (message?.type === "download-audio") {
+    downloadAudioOnly(message.id, message.quality || "standard")
       .then((downloadId) => sendResponse({ ok: true, downloadId }))
       .catch((error) => sendResponse({ ok: false, error: error.message }));
     return true;

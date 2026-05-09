@@ -352,9 +352,9 @@ async function downloadSongPackage(id, quality) {
   });
 
   const zip = buildZip(files);
-  const objectUrl = URL.createObjectURL(new Blob([zip], { type: "application/zip" }));
+  const downloadUrl = createDownloadUrl(zip, "application/zip");
   const downloadId = await chrome.downloads.download({
-    url: objectUrl,
+    url: downloadUrl.url,
     filename: `${baseName}.zip`,
     saveAs: false,
     conflictAction: "uniquify"
@@ -370,7 +370,7 @@ async function downloadSongPackage(id, quality) {
     filename: `${baseName}.zip`,
     downloadedAt: Date.now()
   });
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  downloadUrl.revoke();
   return downloadId;
 }
 
@@ -383,11 +383,9 @@ async function downloadAudioOnly(id, quality) {
 
   const audio = await fetchBinary(song.url);
   const baseName = sanitizeFilename(`${song.ar_name || "未知歌手"} - ${song.name || id}`);
-  const objectUrl = URL.createObjectURL(new Blob([audio.bytes], {
-    type: audio.contentType || "audio/mpeg"
-  }));
+  const downloadUrl = createDownloadUrl(audio.bytes, audio.contentType || "audio/mpeg");
   const downloadId = await chrome.downloads.download({
-    url: objectUrl,
+    url: downloadUrl.url,
     filename: `${baseName}.${guessAudioExtension(audio.contentType, song.url)}`,
     saveAs: false,
     conflictAction: "uniquify"
@@ -403,7 +401,7 @@ async function downloadAudioOnly(id, quality) {
     filename: `${baseName}.${guessAudioExtension(audio.contentType, song.url)}`,
     downloadedAt: Date.now()
   });
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+  downloadUrl.revoke();
   return downloadId;
 }
 
@@ -453,6 +451,32 @@ async function fetchBinary(url) {
 
 function encodeText(text) {
   return new TextEncoder().encode(String(text));
+}
+
+function createDownloadUrl(bytes, mimeType) {
+  const blob = new Blob([bytes], { type: mimeType });
+  if (URL.createObjectURL) {
+    const url = URL.createObjectURL(blob);
+    return {
+      url,
+      revoke: () => setTimeout(() => URL.revokeObjectURL(url), 60_000)
+    };
+  }
+
+  return {
+    url: `data:${mimeType};base64,${bytesToBase64(bytes)}`,
+    revoke: () => undefined
+  };
+}
+
+function bytesToBase64(bytes) {
+  const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < data.length; i += chunkSize) {
+    binary += String.fromCharCode(...data.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
 }
 
 function sanitizeFilename(value) {
